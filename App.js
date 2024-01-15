@@ -1,5 +1,4 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
 import AllExpenses from './screen/AllExpenses';
 import ManageExpense from './screen/ManageExpense';
 import RecentExpenses from './screen/RecentExpenses';
