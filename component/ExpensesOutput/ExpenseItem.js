@@ -1,9 +1,15 @@
 import { Pressable, Text, View, StyleSheet } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { GlobalStyles } from '../../constants/styles';
 import { getFormattedDate } from '../../utils/date';
 
 const ExpenseItem = ({ description, amount, date }) => {
-  const expensePressHandler = () => {};
+  const navigation = useNavigation();
+
+  const expensePressHandler = () => {
+    // Must use the useNavigation hook because the navigation prop is only passed to screens not nested components in a a screen
+    navigation.navigate('ManageExpense');
+  };
   return (
     <Pressable
       onPress={expensePressHandler}
