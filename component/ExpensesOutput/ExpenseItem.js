@@ -3,12 +3,14 @@ import { useNavigation } from '@react-navigation/native';
 import { GlobalStyles } from '../../constants/styles';
 import { getFormattedDate } from '../../utils/date';
 
-const ExpenseItem = ({ description, amount, date }) => {
+const ExpenseItem = ({ id, description, amount, date }) => {
   const navigation = useNavigation();
 
   const expensePressHandler = () => {
     // Must use the useNavigation hook because the navigation prop is only passed to screens not nested components in a a screen
-    navigation.navigate('ManageExpense');
+    navigation.navigate('ManageExpense', {
+      expenseId: id
+    });
   };
   return (
     <Pressable
