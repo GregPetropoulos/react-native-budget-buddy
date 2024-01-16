@@ -1,5 +1,8 @@
 import React, { useLayoutEffect } from 'react';
-import { View, Text } from 'react-native';
+import { View, Text, StyleSheet } from 'react-native';
+import IconButton from '../component/ui/IconButton';
+import Button from '../component/ui/Button';
+import { GlobalStyles } from '../constants/styles';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
@@ -16,11 +19,58 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, isEditing]);
 
+  const deleteExpenseHandler = () => {};
+
+  const cancelHandler = () => {};
+  const confirmHandler = () => {};
+
   return (
-    <View>
-      <Text>Manage Expenses</Text>
+    <View style={styles.container}>
+      <View style={styles.buttons}>
+        <Button style={styles.button} mode='flat' onPress={cancelHandler}>
+          Cancel
+        </Button>
+        <Button style={styles.button} o nPress={confirmHandler}>
+          {isEditing ? 'Update' : 'Add'}
+        </Button>
+      </View>
+      {/* Delete Button */}
+      {isEditing && (
+        <View style={styles.deleteContainer}>
+          <IconButton
+            name='trash'
+            size={36}
+            color={GlobalStyles.colors.error500}
+            onPress={deleteExpenseHandler}
+          />
+        </View>
+      )}
     </View>
   );
 };
 
 export default ManageExpense;
+const styles = StyleSheet.create({
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  // This is the styles sent to the custom button
+  button: {
+    minWidth: 120,
+    marginHorizontal: 8
+  },
+  container: {
+    flex: 1,
+    padding: 24,
+    backgroundColor: GlobalStyles.colors.primary800
+  },
+  deleteContainer: {
+    marginTop: 16,
+    paddingTop: 8,
+    borderTopWidth: 2,
+    borderTopColor: GlobalStyles.colors.primary200,
+    alignItems: 'center'
+  }
+});
