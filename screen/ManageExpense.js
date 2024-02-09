@@ -1,3 +1,4 @@
+// This is a Modal Screen via BottomTabs.Navigator screenOptions
 import React, { useLayoutEffect } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import IconButton from '../component/ui/IconButton';
@@ -19,10 +20,18 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, isEditing]);
 
-  const deleteExpenseHandler = () => {};
+  const deleteExpenseHandler = () => {
+    navigation.goBack()
 
-  const cancelHandler = () => {};
-  const confirmHandler = () => {};
+  };
+
+  const cancelHandler = () => {
+    navigation.goBack()
+  };
+  const confirmHandler = () => {
+    navigation.goBack()
+
+  };
 
   return (
     <View style={styles.container}>
@@ -30,7 +39,7 @@ const ManageExpense = ({ route, navigation }) => {
         <Button style={styles.button} mode='flat' onPress={cancelHandler}>
           Cancel
         </Button>
-        <Button style={styles.button} o nPress={confirmHandler}>
+        <Button style={styles.button} onPress={confirmHandler}>
           {isEditing ? 'Update' : 'Add'}
         </Button>
       </View>
