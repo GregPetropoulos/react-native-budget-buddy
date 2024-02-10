@@ -1,16 +1,18 @@
 // This is a Modal Screen via BottomTabs.Navigator screenOptions
 import React, { useLayoutEffect, useContext } from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, TextInput } from 'react-native';
 import IconButton from '../component/ui/IconButton';
 import Button from '../component/ui/Button';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
+import ExpenseForm from '../component/ManageExpense/ExpenseForm';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
 const ManageExpense = ({ route, navigation }) => {
   // CONTEXT
-  const { deleteExpense, addExpense,updateExpense } = useContext(ExpensesContext);
+  const { deleteExpense, addExpense, updateExpense } =
+    useContext(ExpensesContext);
 
   // expenseId is passed from the ExpenseItem with navigation hook
   const editedExpenseId = route.params?.expenseId;
@@ -33,15 +35,24 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
   const confirmHandler = () => {
-    if(isEditing){
-      updateExpense(editedExpenseId, {description:'Test!!!',amount:29.99, date:new Date('2024-2-10')})
+    if (isEditing) {
+      updateExpense(editedExpenseId, {
+        description: 'Test!!!',
+        amount: 29.99,
+        date: new Date('2024-2-10')
+      });
     }
-    addExpense({description:'Test',amount:19.99, date:new Date('2024-2-10')})
+    addExpense({
+      description: 'Test',
+      amount: 19.99,
+      date: new Date('2024-2-10')
+    });
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
+      <ExpenseForm />
       <View style={styles.buttons}>
         <Button style={styles.button} mode='flat' onPress={cancelHandler}>
           Cancel
