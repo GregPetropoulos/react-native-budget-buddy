@@ -9,14 +9,18 @@ import ExpenseForm from '../component/ManageExpense/ExpenseForm';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
+
 const ManageExpense = ({ route, navigation }) => {
   // CONTEXT
-  const { deleteExpense, addExpense, updateExpense } =
+  const { deleteExpense, addExpense, updateExpense, expenses } =
     useContext(ExpensesContext);
 
   // expenseId is passed from the ExpenseItem with navigation hook
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
+
+  //FOR PREPOPULATING THE FORM SUBMISSION DATA IN ExpenseForm FROM THE CONTEXT
+  const selectedExpense = expenses.find((item) => item.id === editedExpenseId);
 
   // UseLayoutEffect stops the flickering since it mounts at the same time as the component not after the component mounts like useEffect
   useLayoutEffect(() => {
@@ -34,19 +38,12 @@ const ManageExpense = ({ route, navigation }) => {
   const cancelHandler = () => {
     navigation.goBack();
   };
-  const confirmHandler = () => {
+  const confirmHandler = (expenseData) => {
     if (isEditing) {
-      updateExpense(editedExpenseId, {
-        description: 'Test!!!',
-        amount: 29.99,
-        date: new Date('2024-2-10')
-      });
+      updateExpense(editedExpenseId, expenseData);
+    } else {
+      addExpense(expenseData);
     }
-    addExpense({
-      description: 'Test',
-      amount: 19.99,
-      date: new Date('2024-2-10')
-    });
     navigation.goBack();
   };
 
@@ -55,6 +52,8 @@ const ManageExpense = ({ route, navigation }) => {
       <ExpenseForm
         onCancel={cancelHandler}
         submitButtonLabel={isEditing ? 'Update' : 'Add'}
+        onSubmit={confirmHandler}
+        defaultValues={selectedExpense}
       />
 
       {/* Delete Button */}
