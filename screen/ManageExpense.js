@@ -52,15 +52,11 @@ const ManageExpense = ({ route, navigation }) => {
 
   return (
     <View style={styles.container}>
-      <ExpenseForm />
-      <View style={styles.buttons}>
-        <Button style={styles.button} mode='flat' onPress={cancelHandler}>
-          Cancel
-        </Button>
-        <Button style={styles.button} onPress={confirmHandler}>
-          {isEditing ? 'Update' : 'Add'}
-        </Button>
-      </View>
+      <ExpenseForm
+        onCancel={cancelHandler}
+        submitButtonLabel={isEditing ? 'Update' : 'Add'}
+      />
+
       {/* Delete Button */}
       {isEditing && (
         <View style={styles.deleteContainer}>
@@ -78,16 +74,6 @@ const ManageExpense = ({ route, navigation }) => {
 
 export default ManageExpense;
 const styles = StyleSheet.create({
-  buttons: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
-  // This is the styles sent to the custom button
-  button: {
-    minWidth: 120,
-    marginHorizontal: 8
-  },
   container: {
     flex: 1,
     padding: 24,
