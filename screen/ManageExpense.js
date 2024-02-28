@@ -6,6 +6,7 @@ import Button from '../component/ui/Button';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../component/ManageExpense/ExpenseForm';
+import { storeExpense } from '../utils/http';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
@@ -42,6 +43,7 @@ const ManageExpense = ({ route, navigation }) => {
     if (isEditing) {
       updateExpense(editedExpenseId, expenseData);
     } else {
+      storeExpense(expenseData)
       addExpense(expenseData);
     }
     navigation.goBack();
