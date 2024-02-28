@@ -39,12 +39,13 @@ const ManageExpense = ({ route, navigation }) => {
   const cancelHandler = () => {
     navigation.goBack();
   };
-  const confirmHandler = (expenseData) => {
+  const confirmHandler = async (expenseData) => {
     if (isEditing) {
       updateExpense(editedExpenseId, expenseData);
     } else {
-      storeExpense(expenseData)
-      addExpense(expenseData);
+      // The storeExpense will add to the database and return the id we need to update the context so we are in sync
+      const id = await storeExpense(expenseData);
+      addExpense({ ...expenseData, id: id });
     }
     navigation.goBack();
   };
