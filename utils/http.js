@@ -35,6 +35,16 @@ export async function fetchExpenses() {
     };
     expenses.push(expenseObj);
   }
-//   console.log("EXPESNES",expenses)
   return expenses;
 }
+export function updateExpense(id,expenseData){
+return axios.put(`${REACT_APP_FIREBASE_BASE_URL}/expenses/${id}.json`,expenseData)
+}
+
+export  function deleteExpense(id){
+  return axios.delete(`${REACT_APP_FIREBASE_BASE_URL}/expenses/${id}.json`)
+
+}
+
+
+

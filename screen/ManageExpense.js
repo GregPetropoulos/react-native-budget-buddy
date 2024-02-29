@@ -6,22 +6,21 @@ import Button from '../component/ui/Button';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../component/ManageExpense/ExpenseForm';
-import { storeExpense } from '../utils/http';
+import { storeExpense,updateExpense,deleteExpense } from '../utils/http';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
 
 const ManageExpense = ({ route, navigation }) => {
   // CONTEXT
-  const { deleteExpense, addExpense, updateExpense, expenses } =
-    useContext(ExpensesContext);
+  const expenseCtx =useContext(ExpensesContext);
 
   // expenseId is passed from the ExpenseItem with navigation hook
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
   //FOR PREPOPULATING THE FORM SUBMISSION DATA IN ExpenseForm FROM THE CONTEXT
-  const selectedExpense = expenses.find((item) => item.id === editedExpenseId);
+  const selectedExpense = expenseCtx.expenses.find((item) => item.id === editedExpenseId);
 
   // UseLayoutEffect stops the flickering since it mounts at the same time as the component not after the component mounts like useEffect
   useLayoutEffect(() => {
@@ -31,8 +30,9 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, isEditing]);
 
-  const deleteExpenseHandler = () => {
-    deleteExpense(editedExpenseId);
+  const deleteExpenseHandler = async() => {
+    await deleteExpense(editedExpenseId);
+    expenseCtx.deleteExpense(editedExpenseId);
     navigation.goBack();
   };
 
@@ -41,11 +41,14 @@ const ManageExpense = ({ route, navigation }) => {
   };
   const confirmHandler = async (expenseData) => {
     if (isEditing) {
-      updateExpense(editedExpenseId, expenseData);
+      // Optimistic updating the context
+      expenseCtx.updateExpense(editedExpenseId, expenseData);
+      // Updating the db
+      await updateExpense(editedExpenseId, expenseData);
     } else {
       // The storeExpense will add to the database and return the id we need to update the context so we are in sync
       const id = await storeExpense(expenseData);
-      addExpense({ ...expenseData, id: id });
+      expenseCtx.addExpense({ ...expenseData, id: id });
     }
     navigation.goBack();
   };
