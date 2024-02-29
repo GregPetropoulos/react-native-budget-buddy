@@ -1,26 +1,31 @@
 // This is a Modal Screen via BottomTabs.Navigator screenOptions
-import React, { useLayoutEffect, useContext } from 'react';
+import React, { useState, useLayoutEffect, useContext } from 'react';
 import { View, StyleSheet, TextInput } from 'react-native';
 import IconButton from '../component/ui/IconButton';
 import Button from '../component/ui/Button';
 import { GlobalStyles } from '../constants/styles';
 import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../component/ManageExpense/ExpenseForm';
-import { storeExpense,updateExpense,deleteExpense } from '../utils/http';
+import { storeExpense, updateExpense, deleteExpense } from '../utils/http';
+import LoadingOverlay from '../component/ui/LoadingOverlay';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
 
 const ManageExpense = ({ route, navigation }) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
   // CONTEXT
-  const expenseCtx =useContext(ExpensesContext);
+  const expenseCtx = useContext(ExpensesContext);
 
   // expenseId is passed from the ExpenseItem with navigation hook
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
 
   //FOR PREPOPULATING THE FORM SUBMISSION DATA IN ExpenseForm FROM THE CONTEXT
-  const selectedExpense = expenseCtx.expenses.find((item) => item.id === editedExpenseId);
+  const selectedExpense = expenseCtx.expenses.find(
+    (item) => item.id === editedExpenseId
+  );
 
   // UseLayoutEffect stops the flickering since it mounts at the same time as the component not after the component mounts like useEffect
   useLayoutEffect(() => {
@@ -30,7 +35,8 @@ const ManageExpense = ({ route, navigation }) => {
     });
   }, [navigation, isEditing]);
 
-  const deleteExpenseHandler = async() => {
+  const deleteExpenseHandler = async () => {
+    setIsSubmitting(true)
     await deleteExpense(editedExpenseId);
     expenseCtx.deleteExpense(editedExpenseId);
     navigation.goBack();
@@ -40,6 +46,7 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
   const confirmHandler = async (expenseData) => {
+    setIsSubmitting(true)
     if (isEditing) {
       // Optimistic updating the context
       expenseCtx.updateExpense(editedExpenseId, expenseData);
@@ -53,6 +60,9 @@ const ManageExpense = ({ route, navigation }) => {
     navigation.goBack();
   };
 
+if(isSubmitting){
+  return <LoadingOverlay/>
+}
   return (
     <View style={styles.container}>
       <ExpenseForm
