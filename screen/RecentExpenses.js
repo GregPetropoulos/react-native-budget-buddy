@@ -5,33 +5,49 @@ import { ExpensesContext } from '../store/expenses-context';
 import { getDateMinusDays } from '../utils/date';
 import { fetchExpenses } from '../utils/http';
 import LoadingOverlay from '../component/ui/LoadingOverlay';
+import ErrorOverlay from '../component/ui/ErrorOverlay';
 
 const RecentExpenses = () => {
   const [isFetching, setIsFetching] = useState(true);
-  const { expenses, setExpenses } = useContext(ExpensesContext);
+  const [error, setError] = useState();
+  // const { expenses, setExpenses } = useContext(ExpensesContext);
+  const expensesCtx = useContext(ExpensesContext);
 
   useEffect(() => {
-    setIsFetching(true);
     const getExpenses = async () => {
-      const expensesFetched = await fetchExpenses();
-      setIsFetching(false);
-
       /* 
-    VERY IMPORTANT
-    1. FETCHING DATA FROM THE BACKEND
-    2. SET THE DATA IN THE CONTEXT
-    3. WHEN ADDING AN EXPENSE THE USER CAN SEE IT ADDED IMMEDIATELY INSTEAD OF REFETCHING
-    */
+      VERY IMPORTANT
+      1. FETCHING DATA FROM THE BACKEND
+      2. SET THE DATA IN THE CONTEXT
+      3. WHEN ADDING AN EXPENSE THE USER CAN SEE IT ADDED IMMEDIATELY INSTEAD OF REFETCHING
+      */
+      setIsFetching(true);
+      try {
+        const expensesFetched = await fetchExpenses();
+        expensesCtx.setExpenses(expensesFetched);
+      } catch (e) {
+        console.error(e);
+        setError('Could not fetch expenses!');
+      }
 
-      setExpenses(expensesFetched);
+      setIsFetching(false);
     };
     getExpenses();
   }, []);
 
+  const errorHandler = () => {
+    setError(null);
+    // Could have a refetch here
+  };
+
+  if (error && !isFetching) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  }
+
   if (isFetching) {
     return <LoadingOverlay />;
   }
-  const recentExpenses = expenses.filter((item) => {
+  const recentExpenses = expensesCtx.expenses.filter((item) => {
     const today = new Date();
     const date7DaysAgo = getDateMinusDays(today, 7);
     return item.date >= date7DaysAgo && item.date <= today;

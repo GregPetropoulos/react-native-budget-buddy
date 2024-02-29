@@ -1,6 +1,6 @@
 // This is a Modal Screen via BottomTabs.Navigator screenOptions
 import React, { useState, useLayoutEffect, useContext } from 'react';
-import { View, StyleSheet, TextInput } from 'react-native';
+import { View, StyleSheet } from 'react-native';
 import IconButton from '../component/ui/IconButton';
 import Button from '../component/ui/Button';
 import { GlobalStyles } from '../constants/styles';
@@ -8,12 +8,14 @@ import { ExpensesContext } from '../store/expenses-context';
 import ExpenseForm from '../component/ManageExpense/ExpenseForm';
 import { storeExpense, updateExpense, deleteExpense } from '../utils/http';
 import LoadingOverlay from '../component/ui/LoadingOverlay';
+import ErrorOverlay from '../component/ui/ErrorOverlay';
 
 // Using route prop to get params value since this loaded as a screen
 // Use navigation to setOptions
 
 const ManageExpense = ({ route, navigation }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState();
 
   // CONTEXT
   const expenseCtx = useContext(ExpensesContext);
@@ -36,33 +38,51 @@ const ManageExpense = ({ route, navigation }) => {
   }, [navigation, isEditing]);
 
   const deleteExpenseHandler = async () => {
-    setIsSubmitting(true)
-    await deleteExpense(editedExpenseId);
-    expenseCtx.deleteExpense(editedExpenseId);
-    navigation.goBack();
+    setIsSubmitting(true);
+    try {
+      await deleteExpense(editedExpenseId);
+      expenseCtx.deleteExpense(editedExpenseId);
+      navigation.goBack();
+    } catch (e) {
+      setError('Could Not delete expense please try again later');
+      setIsSubmitting(false); //dont want to show a loading overlay need this here
+      console.error(e);
+    }
   };
 
   const cancelHandler = () => {
     navigation.goBack();
   };
   const confirmHandler = async (expenseData) => {
-    setIsSubmitting(true)
-    if (isEditing) {
-      // Optimistic updating the context
-      expenseCtx.updateExpense(editedExpenseId, expenseData);
-      // Updating the db
-      await updateExpense(editedExpenseId, expenseData);
-    } else {
-      // The storeExpense will add to the database and return the id we need to update the context so we are in sync
-      const id = await storeExpense(expenseData);
-      expenseCtx.addExpense({ ...expenseData, id: id });
+    setIsSubmitting(true);
+    try {
+      if (isEditing) {
+        // Optimistic updating the context
+        expenseCtx.updateExpense(editedExpenseId, expenseData);
+        // Updating the db
+        await updateExpense(editedExpenseId, expenseData);
+      } else {
+        // The storeExpense will add to the database and return the id we need to update the context so we are in sync
+        const id = await storeExpense(expenseData);
+        expenseCtx.addExpense({ ...expenseData, id: id });
+      }
+      navigation.goBack();
+    } catch (e) {
+      console.error(e);
+      setError('Could not save data -- please try again later');
+      setIsSubmitting(false);
     }
-    navigation.goBack();
   };
 
-if(isSubmitting){
-  return <LoadingOverlay/>
-}
+  const errorHandler = () => {
+    setError(null);
+  };
+  if (error && !isSubmitting) {
+    return <ErrorOverlay message={error} onConfirm={errorHandler} />;
+  }
+  if (isSubmitting) {
+    return <LoadingOverlay />;
+  }
   return (
     <View style={styles.container}>
       <ExpenseForm
